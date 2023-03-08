@@ -2,10 +2,58 @@ import axios from "axios";
 import express from "express";
 import mongoose from "mongoose";
 import _ from "lodash";
-import {v4 as uuid} from  "uuid";
+import { v4 as uuid } from "uuid";
+import multer from "multer";
+import fs from "fs"
 const app = express();
 
+mongoose.connect("mongodb+srv://admin-khushboo:khushboo9198@cluster0.mrg3ztd.mongodb.net/imageDB", { useNewUrlParser: true }).then(() => console.log("connected successfully")).catch((err) => console.log(err));
 
-export const MyFunction = async function(req, res){
+const imageSchema = new mongoose.Schema({
+    id: String,
+    name: String,
+    img: {
+        data: Buffer,
+        contentType: String
+    }
+});
+
+const imageModel = mongoose.model("imageModel", imageSchema);
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'images')
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname)
+    }
+});
+
+const multerFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith("image")) {
+        cb(null, true);
+    } else {
+        cb(new Error("Not a Image File!!"), false);
+    }
+};
+
+const upload = multer({ storage: storage, fileFilter: multerFilter });     // to use this storage engine.the define engine is "storage"
+
+export const middleWare = upload.single('testImage');
+
+export const SaveImage = async function (req, res) {
+    const saveImage = new imageModel({
+        id: uuid(),
+        name: req.body.name,
+        img: {
+            data: fs.readFileSync("./images/" + req.file.filename),
+            contentType: "image/png"
+        }
+    });
+    saveImage.save().then(() => console.log('image is saved')).catch((err) => console.log(err));
+    res.send("Success");
+}
+
+export const MyFunction = async function (req, res) {
     res.send("<h1>Hello World</h1>");
 }
