@@ -39,7 +39,7 @@ export default function SignUp() {
                     data: user
                 })
                 alert(response.data.message);
-                navigate("/");
+                // navigate("/");
             }
             catch (err) {
                 throw new Error('Unable to get a token.')

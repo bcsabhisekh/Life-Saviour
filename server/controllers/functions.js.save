@@ -72,56 +72,23 @@ export const MyFunction = async function (req, res) {
 }
 
 export const MyLogIn = async function (req, res) {
-    const { email, password, role } = req.body;
-    const response = await publicModel.findOne({ email: email, role: role });
-    if (response) {
-        bcrypt.compare(password, response.password).then(function (result) {
-            if (result) {
-                res.send(response.mobile);
-            }
-            else {
-                res.send({ message: "Invalid ceredentials" });
-            }
-        });
-    }
-    else {
-        res.send({ message: "User not found" });
-    }
+    console.log(req.body);
+    res.send({ message: "Nice" });
 }
-
-
 
 export const MySignUp = async function (req, res) {
     const { name, email, mobile, role, password } = req.body;
-    const response = await publicModel.findOne({ email: email });
-    if (response) {
-        res.send({ message: "User already exist with this email" });
-    }
-    else {
-        // bcrypt.genSalt(12, function (err, salt) {
-        //     bcrypt.hash(password, salt, function (err, hash) {
-        //         const user = new publicModel({
-        //             id: uuid(),
-        //             name: name,
-        //             email: email,
-        //             mobile: mobile,
-        //             role: role,
-        //             password: hash
-        //         });
-        //         user.save();
-        //     });
-        // });
-        bcrypt.hash(password, 12).then(function (hash) {
-            const user = new publicModel({
-                id: uuid(),
-                name: name,
-                email: email,
-                mobile: mobile,
-                role: role,
-                password: hash
-            });
-            user.save();
-        });
-        res.send({ message: "Registered successfully" });
-    }
+    const user = new publicModel({
+        id: uuid(),
+        name: name,
+        email: email,
+        mobile: mobile,
+        role: role,
+        password: ""
+    });
+    bcrypt.hash(password, 12).then(function (hash) {
+        user.password = hash;
+    });
+    
+    res.send({ message: "Success" });
 }

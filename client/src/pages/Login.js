@@ -32,15 +32,10 @@ export default function Login() {
                     params: {
 
                     },
-                    data:
-                    {
-                        email: user.email,
-                        password: user.password,
-                        role: user.role
-                    }
+                    data: user
                 })
                 console.log(response.data);
-                navigate("/");
+                // navigate("/");
             }
             catch (err) {
                 throw new Error('Unable to get a token.')
