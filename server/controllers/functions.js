@@ -50,10 +50,21 @@ export const SaveImage = async function (req, res) {
             contentType: "image/png"
         }
     });
-    saveImage.save().then(() => console.log('image is saved')).catch((err) => console.log(err));
+    await saveImage.save().then(() => console.log('image is saved')).catch((err) => console.log(err));
     res.send("Success");
 }
 
 export const MyFunction = async function (req, res) {
-    res.send("<h1>Hello World</h1>");
+    const allData = await imageModel.find();
+    res.json(allData);
+}
+
+export const MyLogIn = async function (req, res) {
+    console.log(req.body);
+    res.send({ message: "Nice" });
+}
+
+export const MySignUp = async function (req, res) {
+    console.log(req.body);
+    res.send({ message: "Success" });
 }
