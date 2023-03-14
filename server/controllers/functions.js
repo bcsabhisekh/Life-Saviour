@@ -54,6 +54,7 @@ const upload = multer({ storage: storage, fileFilter: multerFilter });     // to
 export const middleWare = upload.single('testImage');
 
 export const SaveImage = async function (req, res) {
+    console.log(req.body);
     const saveImage = new imageModel({
         id: uuid(),
         name: req.body.name,
