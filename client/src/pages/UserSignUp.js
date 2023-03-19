@@ -2,7 +2,7 @@ import { React, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-export default function SignUp() {
+export default function UserSignUp() {
 
     const navigate = useNavigate();
 
@@ -10,7 +10,6 @@ export default function SignUp() {
         name: "",
         email: "",
         mobile: "",
-        role: "",
         password: "",
         repassword: ""
     });
@@ -32,14 +31,14 @@ export default function SignUp() {
                 // const response = await axios.post("http://localhost:5000/signup", user);
                 const response = await axios({
                     method: "post",
-                    url: `http://localhost:5000/signup`,
+                    url: `http://localhost:5000/usersignup`,
                     params: {
                         email: user.email
                     },
                     data: user
                 })
                 alert(response.data.message);
-                // navigate("/");
+                navigate("/");
             }
             catch (err) {
                 throw new Error('Unable to get a token.')
@@ -67,7 +66,7 @@ export default function SignUp() {
                         <label for="inputEmail4">Mobile</label>
                         <input type="number" name="mobile" onChange={handleChange} value={user.mobile} className="form-control" id="inputEmail4" placeholder="Contact No." />
                     </div>
-                    <label>
+                    {/* <label>
                         Pick a Role:
                         <select name="role" value={user.role} onChange={handleChange}>
                             <option value="Select">Select</option>
@@ -77,7 +76,7 @@ export default function SignUp() {
                                 </option>
                             })}
                         </select>
-                    </label>
+                    </label> */}
                 </div>
                 <div className="form-row">
                     <div className="form-group col-md-6">
@@ -90,7 +89,7 @@ export default function SignUp() {
                     </div>
                 </div>
                 <button type="submit" className="btn btn-primary">Sign Up</button>
-                <p>Already have an account? <Link to="/login" >Log In</Link></p>
+                <p>Already have an account? <Link to="/userlogin" >Log In</Link></p>
             </form >
         </div >
     )

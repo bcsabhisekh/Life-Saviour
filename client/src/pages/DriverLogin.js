@@ -2,14 +2,13 @@ import { React, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-export default function Login() {
+export default function DriverLogin() {
 
     const navigate = useNavigate();
 
     const [user, setUser] = useState({
         email: "",
         password: "",
-        role: ""
     });
 
     const handleChange = (e) => {
@@ -22,20 +21,20 @@ export default function Login() {
 
     const onFormSubmit = async (e) => {
         e.preventDefault();
-        const { email, password, role } = user;
-        if (email && password && role) {
+        const { email, password } = user;
+        if (email && password) {
             try {
                 // const response = await axios.post("http://localhost:5000/login", user);
                 const response = await axios({
                     method: "post",
-                    url: `http://localhost:5000/login`,
+                    url: `http://localhost:5000/driverlogin`,
                     params: {
 
                     },
                     data: user
                 })
                 console.log(response.data);
-                // navigate("/");
+                navigate("/");
             }
             catch (err) {
                 throw new Error('Unable to get a token.')
@@ -55,12 +54,8 @@ export default function Login() {
                     <label for="exampleInputPassword1" className="form-label">Password</label>
                     <input name="password" type="password" value={user.password} onChange={handleChange} className="form-control" id="exampleInputPassword1" />
                 </div>
-                <div className="mb-3">
-                    <label for="exampleInputRole1" className="form-label">Designation</label>
-                    <input name="role" type="text" value={user.role} onChange={handleChange} className="form-control" id="exampleInputPassword1" />
-                </div>
                 <button type="submit" className="btn btn-primary">Submit</button>
-                <p>Haven't any account? <Link to="/signup" >Sign Up</Link></p>
+                <p>Haven't any account? <Link to="/driversignup" >Sign Up</Link></p>
             </form>
         </div>
     )
