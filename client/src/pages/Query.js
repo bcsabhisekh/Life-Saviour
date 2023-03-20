@@ -65,11 +65,11 @@ export default function Query() {
                 "content-type": "multipart/form-data",
             },
         };
-        const url = "http://localhost:5000/upload";
+        const url = "http://localhost:5000/query";
         try {
             const response = await axios.post(url, formData, config);
             console.log(response.data);
-            navigate("/");
+            // navigate("/");
         }
         catch (err) {
             throw new Error('Unable to get a token.')

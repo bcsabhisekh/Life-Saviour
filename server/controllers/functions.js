@@ -68,7 +68,7 @@ const driverSchema = new mongoose.Schema({
     email: String,
     password: String,
     mobile: Number,
-    free: Boolean
+    hospital: String
 });
 
 const hospitalModel = mongoose.model("hospitalModel", hospitalSchema);
@@ -102,36 +102,67 @@ const upload = multer({ storage: storage, fileFilter: multerFilter });     // to
 
 export const middleWare = upload.single('testImage');
 
+const GetDistance = async function (origin, destination) {
+    try {
+        const data = await axios.get(`https://dev.virtualearth.net/REST/v1/Routes/DistanceMatrix?origins=${origin}&destinations=${destination}&travelMode=driving&key=${process.env.BING_MAP_KEY}`);
+        return data.data.resourceSets[0].resources[0].results[0].travelDistance;
+    }
+    catch {
+        return 100000;
+    }
+    // data.data.resourceSets[0].resources[0].results[0].travelDistance;
+}
+
 export const SaveQuery = async function (req, res) {
-    console.log(req.body);
+    // console.log(req.body);
     const userDetail = {
         user_name: req.body.user_name, user_email: req.body.email, user_mobile: req.body.mobile,
         lat: req.body.lat, log: req.body.log
     };
 
+    const driverDetail = {
+        dr_name: "", dr_email: "", dr_mobile: ""
+    };
 
-    const saveQuery = new queryModel({
-        id: uuid(),
-        user_name: userDetail.user_name,
-        user_email: userDetail.user_email,
-        user_mobile: userDetail.mobile,
-        user_address: userDetail.lat + ',' + userDetail.log,
-        dr_name: "",
-        dr_email: "",
-        dr_mobile: "",
-        is_open: true,
-        name: req.body.name,
-        img: {
-            data: fs.readFileSync("./images/" + req.file.filename),
-            contentType: "image/png"
-        }
+    let newresponse = [];
+    const response = await hospitalModel.find();
+    // Greedy Algorithm
+    newresponse = response.map((item) => {
+        const origin = (userDetail.lat + "," + userDetail.log).toString();
+        const destination = (item.lat + "," + item.log).toString();
+        const obj = new Object();
+        obj.id = item.id;
+        obj['name'] = item.name;
+        obj['accident'] = item.accident;
+        obj['distance'] = GetDistance(origin, destination).then((res) => (res));
+        // obj['distance'] = GetDistance(origin, destination).then((res) => { return res; });
+        // console.log(obj);
+        return obj;
+        // console.log(newresponse[0]);
     });
-    await saveQuery.save().then(() => console.log('image is saved')).catch((err) => console.log(err));
+    setTimeout(() => (console.log()), 5000);
+    // const saveQuery = new queryModel({
+    //     id: uuid(),
+    //     user_name: userDetail.user_name,
+    //     user_email: userDetail.user_email,
+    //     user_mobile: userDetail.mobile,
+    //     user_address: userDetail.lat + ',' + userDetail.log,
+    //     dr_name: "",
+    //     dr_email: "",
+    //     dr_mobile: "",
+    //     is_open: true,
+    //     name: req.body.name,
+    //     img: {
+    //         data: fs.readFileSync("./images/" + req.file.filename),
+    //         contentType: "image/png"
+    //     }
+    // });
+    // // await saveQuery.save().then(() => console.log('image is saved')).catch((err) => console.log(err));
     res.send({ message: "ok" });
 }
 
 export const DriverSignUp = async function (req, res) {
-    const { name, email, password, mobile } = req.body;
+    const { name, email, password, mobile, hospital } = req.body;
     const response = await driverModel.findOne({ email: email });
     if (response) {
         res.send({ message: "User already exist with this email" });
@@ -144,7 +175,7 @@ export const DriverSignUp = async function (req, res) {
                 email: email,
                 mobile: mobile,
                 password: hash,
-                free: true
+                hospital: hospital
             });
             user.save();
         });
