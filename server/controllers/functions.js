@@ -47,7 +47,8 @@ const querySchema = new mongoose.Schema({
     dr_email: String,
     dr_mobile: Number,
     is_open: Boolean,
-    name: String,
+    img_name: String,
+    hospital: String,
     img: {
         data: Buffer,
         contentType: String
@@ -68,7 +69,8 @@ const driverSchema = new mongoose.Schema({
     email: String,
     password: String,
     mobile: Number,
-    hospital: String
+    hospital: String,
+    free: Boolean
 });
 
 const hospitalModel = mongoose.model("hospitalModel", hospitalSchema);
@@ -115,50 +117,69 @@ const GetDistance = async function (origin, destination) {
 
 export const SaveQuery = async function (req, res) {
     // console.log(req.body);
+    const accident = req.body.description;
     const userDetail = {
         user_name: req.body.user_name, user_email: req.body.email, user_mobile: req.body.mobile,
         lat: req.body.lat, log: req.body.log
     };
 
-    const driverDetail = {
-        dr_name: "", dr_email: "", dr_mobile: ""
-    };
-
     let newresponse = [];
     const response = await hospitalModel.find();
+
     // Greedy Algorithm
-    newresponse = response.map((item) => {
+    response && response.map(async (item) => {
         const origin = (userDetail.lat + "," + userDetail.log).toString();
         const destination = (item.lat + "," + item.log).toString();
         const obj = new Object();
         obj.id = item.id;
         obj['name'] = item.name;
         obj['accident'] = item.accident;
-        obj['distance'] = GetDistance(origin, destination).then((res) => (res));
-        // obj['distance'] = GetDistance(origin, destination).then((res) => { return res; });
-        // console.log(obj);
-        return obj;
-        // console.log(newresponse[0]);
+        obj['distance'] = await GetDistance(origin, destination);
+        obj['driver'] = await driverModel.findOne({ hospital: item.name, free: true });
+        if (obj['driver'] && Object.keys(obj['driver']).length > 0)
+            newresponse.push(obj);
     });
-    setTimeout(() => (console.log()), 5000);
-    // const saveQuery = new queryModel({
-    //     id: uuid(),
-    //     user_name: userDetail.user_name,
-    //     user_email: userDetail.user_email,
-    //     user_mobile: userDetail.mobile,
-    //     user_address: userDetail.lat + ',' + userDetail.log,
-    //     dr_name: "",
-    //     dr_email: "",
-    //     dr_mobile: "",
-    //     is_open: true,
-    //     name: req.body.name,
-    //     img: {
-    //         data: fs.readFileSync("./images/" + req.file.filename),
-    //         contentType: "image/png"
-    //     }
-    // });
-    // // await saveQuery.save().then(() => console.log('image is saved')).catch((err) => console.log(err));
-    res.send({ message: "ok" });
+
+    let data = new Object();
+
+    setTimeout(async function () {
+        function compare(a, b) {
+            if (a.distance < b.distance)
+                return -1;
+            else if (a.distance > b.distance)
+                return 1;
+            else
+                return 0;
+        }
+        newresponse.sort(compare);
+        for (let i = 0; i < newresponse.length; i++) {
+            const obj = newresponse[i];
+            if (obj[`${accident}`] == true) {
+                data = obj;
+                break;
+            }
+        }
+        const saveQuery = new queryModel({
+            id: uuid(),
+            user_name: userDetail.user_name,
+            user_email: userDetail.user_email,
+            user_mobile: userDetail.mobile,
+            user_address: userDetail.lat + ',' + userDetail.log,
+            dr_name: data.driver.name,
+            dr_email: data.driver.email,
+            dr_mobile: data.driver.mobile,
+            is_open: true,
+            hospital: data.hospital,
+            img_name: req.body.name,
+            img: {
+                data: fs.readFileSync("./images/" + req.file.filename),
+                contentType: "image/png"
+            }
+        });
+        await driverModel.updateOne({ email: data.driver.email }, { $set: { free: false } });
+        await saveQuery.save().then(() => console.log('image is saved')).catch((err) => console.log(err));
+    }, 3000);
+    setTimeout(() => (res.send({ message: "ok" })), 3000);
 }
 
 export const DriverSignUp = async function (req, res) {
@@ -175,7 +196,8 @@ export const DriverSignUp = async function (req, res) {
                 email: email,
                 mobile: mobile,
                 password: hash,
-                hospital: hospital
+                hospital: hospital,
+                free: true
             });
             user.save();
         });
