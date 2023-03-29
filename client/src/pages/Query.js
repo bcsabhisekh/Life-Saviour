@@ -69,7 +69,7 @@ export default function Query() {
         try {
             const response = await axios.post(url, formData, config);
             console.log(response.data);
-            // navigate("/");
+            navigate("/dashboard");
         }
         catch (err) {
             throw new Error('Unable to get a token.')

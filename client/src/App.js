@@ -8,6 +8,7 @@ import AdminLogin from "./pages/AdminLogin.js";
 import AdminSignUp from "./pages/AdminSignUp.js";
 import DriverLogin from "./pages/DriverLogin.js";
 import DriverSignUp from "./pages/DriverSignUp.js";
+import Dashboard from "./pages/Dashboard.js";
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/adminsignup" element={<AdminSignUp />} />
           <Route path="/adminlogin" element={<AdminLogin />} />
           <Route path="/query" element={<Query />} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
       </Router>
     </div>

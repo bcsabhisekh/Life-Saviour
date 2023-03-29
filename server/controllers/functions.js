@@ -159,28 +159,40 @@ export const SaveQuery = async function (req, res) {
                 break;
             }
         }
-        const saveQuery = new queryModel({
-            id: uuid(),
-            user_name: userDetail.user_name,
-            user_email: userDetail.user_email,
-            user_mobile: userDetail.mobile,
-            user_address: userDetail.lat + ',' + userDetail.log,
-            dr_name: data.driver.name,
-            dr_email: data.driver.email,
-            dr_mobile: data.driver.mobile,
-            is_open: true,
-            hospital: data.hospital,
-            img_name: req.body.name,
-            img: {
-                data: fs.readFileSync("./images/" + req.file.filename),
-                contentType: "image/png"
-            }
-        });
-        await driverModel.updateOne({ email: data.driver.email }, { $set: { free: false } });
-        await saveQuery.save().then(() => console.log('image is saved')).catch((err) => console.log(err));
+
+        console.log(data);
+
+        // const saveQuery = new queryModel({
+        //     id: uuid(),
+        //     user_name: userDetail.user_name,
+        //     user_email: userDetail.user_email,
+        //     user_mobile: userDetail.mobile,
+        //     user_address: userDetail.lat + ',' + userDetail.log,
+        //     dr_name: data.driver.name,
+        //     dr_email: data.driver.email,
+        //     dr_mobile: data.driver.mobile,
+        //     is_open: true,
+        //     hospital: data.hospital,
+        //     img_name: req.body.name,
+        //     img: {
+        //         data: fs.readFileSync("./images/" + req.file.filename),
+        //         contentType: "image/png"
+        //     }
+        // });
+        // await driverModel.updateOne({ email: data.driver.email }, { $set: { free: false } });
+        // await saveQuery.save().then(() => console.log('image is saved')).catch((err) => console.log(err));
     }, 3000);
     setTimeout(() => (res.send({ message: "ok" })), 3000);
 }
+
+
+export const CloseQuery = async function (req, res) {
+    const { dr_email } = req.body;
+    await driverModel.updateOne({ email: dr_email }, { $set: { free: true } });
+    await queryModel.updateOne({ dr_email: dr_email }, { $set: { is_open: false } });
+    res.send({ message: "ok" });
+}
+
 
 export const DriverSignUp = async function (req, res) {
     const { name, email, password, mobile, hospital } = req.body;
@@ -330,4 +342,9 @@ export const PostHospitalDetails = async function (req, res) {
     });
     hospital.save();
     res.send({ message: "ok" });
+}
+
+export const GetQuery = async function (req, res) {
+    const data = await queryModel.find();
+    res.json(data);
 }
