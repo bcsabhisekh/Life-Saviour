@@ -1,6 +1,7 @@
 import React from "react";
 import Logo from "./images/logo.jpg";
 import './Header.css';
+import { NavLink } from "react-router-dom";
 
 export default function Header() {
     return (
@@ -17,15 +18,15 @@ export default function Header() {
                         </button>
                         <div className="collapse navbar-collapse d-flex flex-row-reverse" id="navbarNavAltMarkup">
                             <div className="navbar-nav ">
-                                <a className="nav-link active fs-5" aria-current="page" href="#">Home</a>
-                                <a className="nav-link fs-5" href="#">Features</a>
-                                <a className="nav-link fs-5" href="#">Pricing</a>
-                                <a className="nav-link fs-5" href="#">Disabled</a>
+                                <NavLink to="/" className="nav-link active fs-5">Home</NavLink>
+                                <NavLink to="/dashboard" className="nav-link active fs-5">Dashboard</NavLink>
+                                <NavLink to="/query" className="nav-link active fs-5">Emergency</NavLink>
+                                <a className="nav-link active fs-5" href="#footer">Contact</a>
                             </div>
                         </div>
                     </div>
                 </nav>
             </section>
-        </div>
+        </div >
     )
 };

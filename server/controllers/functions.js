@@ -223,15 +223,15 @@ export const DriverLogIn = async function (req, res) {
     if (response) {
         bcrypt.compare(password, response.password).then(function (result) {
             if (result) {
-                res.send(response);
+                res.status(200).send(response);
             }
             else {
-                res.send({ message: "Invalid ceredentials" });
+                res.status(401).send({ message: "Invalid ceredentials" });
             }
         });
     }
     else {
-        res.send({ message: "Client not found" });
+        res.status(401).send({ message: "Client not found" });
     }
 }
 
@@ -283,15 +283,15 @@ export const UserLogIn = async function (req, res) {
     if (response) {
         bcrypt.compare(password, response.password).then(function (result) {
             if (result) {
-                res.send(response);
+                res.status(200).send(response);
             }
             else {
-                res.send({ message: "Invalid ceredentials" });
+                res.status(401).send({ message: "Invalid ceredentials" });
             }
         });
     }
     else {
-        res.send({ message: "User not found" });
+        res.status(401).send({ message: "User not found" });
     }
 }
 

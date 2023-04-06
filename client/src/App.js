@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Query from "./pages/Query.js";
 import Home from "./pages/Home.js";
@@ -9,23 +9,25 @@ import AdminSignUp from "./pages/AdminSignUp.js";
 import DriverLogin from "./pages/DriverLogin.js";
 import DriverSignUp from "./pages/DriverSignUp.js";
 import Dashboard from "./pages/Dashboard.js";
+export const UserContext = React.createContext();
 
 export default function App() {
+
+  const [user, setUser] = useState({});
+
   return (
     <div>
-      <Router>
-        <Routes>
-          <Route exact path="/" element={<Home />} />
-          <Route path="/userlogin" element={<UserLogin />} />
-          <Route path="/usersignup" element={<UserSignUp />} />
-          <Route path="/driversignup" element={<DriverSignUp />} />
-          <Route path="/driverlogin" element={<DriverLogin />} />
-          <Route path="/adminsignup" element={<AdminSignUp />} />
-          <Route path="/adminlogin" element={<AdminLogin />} />
-          <Route path="/query" element={<Query />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-        </Routes>
-      </Router>
-    </div>
+      <UserContext.Provider value={[user, setUser]}>
+        <Router>
+          <Routes>
+            <Route exact path="/" element={<Home />} />
+            <Route path="/userlogin" element={<UserLogin />} />
+            <Route path="/usersignup" element={<UserSignUp />} />
+            <Route path="/query" element={Object.keys(user).length > 0 ? <Query /> : <UserLogin />} />
+            <Route path="/dashboard" element={Object.keys(user).length > 0 ? <Dashboard /> : <UserLogin />} />
+          </Routes>
+        </Router>
+      </UserContext.Provider>
+    </div >
   );
 }

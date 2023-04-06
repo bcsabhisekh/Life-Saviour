@@ -1,12 +1,19 @@
-import { React, useEffect, useState } from "react";
+import { React, useEffect, useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import "./Query.css";
 import axios from "axios";
+import { UserContext } from "../App";
+
 
 export default function Query() {
 
     const date = new Date();
 
     const navigate = useNavigate();
+
+    const [user, setUser] = useContext(UserContext);
 
     const [detail, setDetail] = useState({
         description: "",
@@ -77,22 +84,41 @@ export default function Query() {
     }
 
     return (
-        <div>
-            <form onSubmit={onFormSubmit}>
-                <div className="mb-3">
-                    <label for="exampleInputDescription" className="form-label">Description</label>
-                    <input autocomplete="off" name="description" type="text" value={detail.description} onChange={handleChange} className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" />
+        <>
+            <Header />
+            <div className="container-fluid">
+                <div className="items">
+                    <form onSubmit={onFormSubmit}>
+                        <div className="inneritem shadow pb-5">
+                            <div className="text-center pb-5 pt-5">
+                                <h2>Book Emergency</h2>
+                            </div>
+                            <div className="row ">
+                                <div className="mb-3 col-md-6 mx-auto">
+                                    <label for="exampleInputDescription" className="form-label">Description</label>
+                                    <input autocomplete="off" name="description" type="text" value={detail.description} onChange={handleChange} className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" />
+                                </div>
+                            </div>
+                            <div className="row ">
+                                <div className="mb-3 col-md-6 mx-auto">
+                                    <label for="exampleInputAddress" className="form-label">Current Location</label>
+                                    <input autocomplete="off" name="location" type="text" value={location.lat && location.lat + ',' + location.log} className="form-control" id="exampleInputLocation" aria-describedby="locationHelp" />
+                                </div>
+                            </div>
+                            <div className="row ">
+                                <div className="mb-3 col-md-6 mx-auto">
+                                    <label for="exampleInputImage" className="form-label">Image Upload</label>
+                                    <input type={'file'} name="testImage" onChange={onInputChange} />
+                                </div>
+                            </div>
+                            <div className="text-center p-3">
+                                <button type="submit" className="btn btn-info">Submit</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-                <div className="mb-3">
-                    <label for="exampleInputAddress" className="form-label">Current Location</label>
-                    <input autocomplete="off" name="location" type="text" value={location.lat && location.lat + ',' + location.log} className="form-control" id="exampleInputLocation" aria-describedby="locationHelp" />
-                </div>
-                <div className="mb-3">
-                    <label for="exampleInputImage" className="form-label">Image Upload</label>
-                    <input type={'file'} name="testImage" onChange={onInputChange} />
-                </div>
-                <button type="submit" className="btn btn-primary">Submit</button>
-            </form>
-        </div>
+            </div >
+            <Footer />
+        </>
     );
 }

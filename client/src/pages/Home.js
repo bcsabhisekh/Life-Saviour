@@ -13,9 +13,12 @@ import Notification from "../components/images/notification.jpg";
 import Oauth from "../components/images/oauth.jpg";
 import Driver from "../components/images/driver.png"
 import Victim from "../components/images/victim.png"
+import { useNavigate } from "react-router-dom";
 
 
 export default function Home() {
+
+    const navigate = useNavigate();
 
     // const [data, setData] = useState([]);
 
@@ -46,8 +49,8 @@ export default function Home() {
                                 <h3>Lorem ipsum dolor sit amet, consectetur.</h3>
                             </div>
                             <div className="text-center">
-                                <button type="button" class="btn btn-success m-2">Sign Up</button>
-                                <button type="button" class="btn btn-dark m-2">Sign In</button>
+                                <button type="button" onClick={() => navigate("/usersignup")} class="btn btn-success m-2">Sign Up</button>
+                                <button type="button" onClick={() => navigate("/userlogin")} class="btn btn-dark m-2">Sign In</button>
                             </div>
                         </div>
                     </div>
@@ -117,7 +120,7 @@ export default function Home() {
                                     <div className="card-body">
                                         <h5 className="card-title">Victim</h5>
                                         <p className="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                        <a href="#" className="btn btn-dark">Go somewhere</a>
+                                        <a href="/userlogin" className="btn btn-dark">Get Started</a>
                                     </div>
                                 </div>
                             </div>
@@ -127,7 +130,7 @@ export default function Home() {
                                     <div className="card-body">
                                         <h5 className="card-title">Driver</h5>
                                         <p className="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                        <a href="#" className="btn btn-dark">Go somewhere</a>
+                                        <a href="/userlogin" className="btn btn-dark">Get Started</a>
                                     </div>
                                 </div>
                             </div>

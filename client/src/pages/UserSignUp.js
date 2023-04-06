@@ -1,6 +1,9 @@
 import { React, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 import axios from "axios";
+import "./UserSignUp.css";
 
 export default function UserSignUp() {
 
@@ -25,8 +28,8 @@ export default function UserSignUp() {
     const onFormSubmit = async (e) => {
         e.preventDefault();
         // console.log(user);
-        const { name, email, mobile, role, password, repassword } = user;
-        if (name && email && mobile && role && password && (password === repassword)) {
+        const { name, email, mobile, password, repassword } = user;
+        if (name && email && mobile && password && (password === repassword)) {
             try {
                 // const response = await axios.post("http://localhost:5000/signup", user);
                 const response = await axios({
@@ -38,7 +41,7 @@ export default function UserSignUp() {
                     data: user
                 })
                 alert(response.data.message);
-                navigate("/");
+                navigate("/userlogin");
             }
             catch (err) {
                 throw new Error('Unable to get a token.')
@@ -46,51 +49,64 @@ export default function UserSignUp() {
         }
     }
 
-    const options = ['Public', 'Ambulance', 'Admin'];
+    const options = ['Public', 'Ambulance'];
 
     return (
-        <div>
-            <form onSubmit={onFormSubmit}>
-                <div className="form-row">
-                    <div className="form-group col-md-6">
-                        <label for="inputEmail4">Name</label>
-                        <input type="text" name="name" onChange={handleChange} value={user.name} className="form-control" id="inputEmail4" placeholder="Name" />
-                    </div>
-                    <div className="form-group col-md-6">
-                        <label for="inputPassword4">Email</label>
-                        <input type="email" name="email" onChange={handleChange} value={user.email} className="form-control" id="inputPassword4" placeholder="Email" />
-                    </div>
+        <>
+            <Header />
+            <div className="container-fluid">
+                <div className="items">
+                    <form onSubmit={onFormSubmit} className="shadow">
+                        <div className="text-center pb-4 pt-5">
+                            <h2>User SignUp</h2>
+                        </div>
+                        <div className="form-row p-3">
+                            <div className="form-group col-md-6 mx-auto">
+                                <label for="inputEmail4">Name</label>
+                                <input autoComplete="off" type="text" name="name" onChange={handleChange} value={user.name} className="form-control" id="inputEmail4" placeholder="Name" />
+                            </div>
+                            <div className="form-group col-md-6 mx-auto mt-3">
+                                <label for="inputPassword4">Email</label>
+                                <input autoComplete="off" type="email" name="email" onChange={handleChange} value={user.email} className="form-control" id="inputPassword4" placeholder="Email" />
+                            </div>
+                        </div>
+                        <div className="form-row p-3">
+                            <div className="form-group col-md-6 mx-auto">
+                                <label for="inputEmail4">Mobile</label>
+                                <input autoComplete="off" type="number" name="mobile" onChange={handleChange} value={user.mobile} className="form-control" id="inputEmail4" placeholder="Contact No." />
+                            </div>
+                            {/* <div className="form-group col-md-6 mx-auto mt-4">
+                                <label>
+                                    Pick a Role:
+                                    <select name="role" className="form-select mt-2" value={user.role} onChange={handleChange}>
+                                        <option value="Select">Select</option>
+                                        {options.map((item, index) => {
+                                            return <option value={item} key={index} >
+                                                {item}
+                                            </option>
+                                        })}
+                                    </select>
+                                </label>
+                            </div> */}
+                        </div>
+                        <div className="form-row p-3">
+                            <div className="form-group col-md-6 mx-auto">
+                                <label for="inputEmail4">Password</label>
+                                <input autoComplete="off" type="text" name="password" onChange={handleChange} value={user.password} className="form-control" id="inputEmail4" placeholder="Password" />
+                            </div>
+                            <div className="form-group col-md-6 mx-auto mt-3">
+                                <label for="inputPassword4">Re-Password</label>
+                                <input autoComplete="off" type="text" name="repassword" onChange={handleChange} value={user.repassword} className="form-control" id="inputPassword4" placeholder="Re-Password" />
+                            </div>
+                        </div>
+                        <div className="text-center p-4">
+                            <button type="submit" className="btn btn-dark">Sign Up</button>
+                            <p className="mt-2">Already have an account? <Link to="/userlogin" style={{ textDecoration: "none" }}>Log In</Link></p>
+                        </div>
+                    </form >
                 </div>
-                <div className="form-row">
-                    <div className="form-group col-md-6">
-                        <label for="inputEmail4">Mobile</label>
-                        <input type="number" name="mobile" onChange={handleChange} value={user.mobile} className="form-control" id="inputEmail4" placeholder="Contact No." />
-                    </div>
-                    {/* <label>
-                        Pick a Role:
-                        <select name="role" value={user.role} onChange={handleChange}>
-                            <option value="Select">Select</option>
-                            {options.map((item, index) => {
-                                return <option value={item} key={index} >
-                                    {item}
-                                </option>
-                            })}
-                        </select>
-                    </label> */}
-                </div>
-                <div className="form-row">
-                    <div className="form-group col-md-6">
-                        <label for="inputEmail4">Password</label>
-                        <input type="text" name="password" onChange={handleChange} value={user.password} className="form-control" id="inputEmail4" placeholder="Password" />
-                    </div>
-                    <div className="form-group col-md-6">
-                        <label for="inputPassword4">Re-Password</label>
-                        <input type="text" name="repassword" onChange={handleChange} value={user.repassword} className="form-control" id="inputPassword4" placeholder="Re-Password" />
-                    </div>
-                </div>
-                <button type="submit" className="btn btn-primary">Sign Up</button>
-                <p>Already have an account? <Link to="/userlogin" >Log In</Link></p>
-            </form >
-        </div >
+            </div >
+            <Footer />
+        </>
     )
 }
