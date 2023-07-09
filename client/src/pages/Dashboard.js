@@ -1,29 +1,39 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Header from "../components/Header.js";
 import Footer from "../components/Footer.js";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
 import DashboardImage from "../components/images/dashboard.png";
+import { UserContext } from "../App.js";
+import LoadingSpinner from "./LoadingSpinner";
 
 
 export default function Dashboard() {
 
     const [query, setQuery] = useState([]);
 
+    const [isLoading, setIsLoading] = useState(false);
+
+    const [user, setUser] = useContext(UserContext);
+
     const navigate = useNavigate();
 
     const GetQuery = async function () {
+        setIsLoading(true);
         try {
             const response = await axios.get("http://localhost:5000/getquery");
-            console.log(response.data);
+            // console.log(response.data);
             setQuery(response.data);
+            setIsLoading(false);
         } catch (err) {
+            setIsLoading(false);
             console.log(err);
         }
     }
 
     const CloseQuery = async function (dr_email) {
+        setIsLoading(true);
         try {
             // const response = await axios.get("http://localhost:5000");
             const response = await axios({
@@ -34,15 +44,39 @@ export default function Dashboard() {
                 data: { dr_email: dr_email }
             });
             console.log(response.data.message);
-            window.location.reload(true);
+            setIsLoading(false);
+            navigate("/dashboard");
         }
         catch (err) {
+            setIsLoading(false);
             throw (err);
         }
     }
 
+    const ShowPublic = function ({ dr_email, dr_mobile, hospital }) {
+        return (<div className="text-center">
+            <h5 className="card-title">Ambulance Detail</h5>
+            <p><b>Driver No. - </b>{dr_mobile}</p>
+            <p><b>Driver Email -</b>{dr_email}</p>
+            <p><b>Hospital Name - </b>{hospital}</p>
+        </div>);
+    }
+
+
+    const ShowAmbulance = function ({ user_address, user_email, user_mobile, user_name }) {
+        return (
+            <div className="text-center">
+                <h5 className="card-title">Patient Detail</h5>
+                <p><b>Patient - </b>{user_name}</p>
+                <p><b>Patient Email -</b>{user_email}</p>
+                <p><b>Patient No - </b>{user_mobile}</p>
+                <p><b>Patient Loc - </b>{user_address}</p>
+            </div>);
+    }
+
+
     const ShowQuery = function ({ data }) {
-        console.log(data.length);
+        // console.log(data.length);
         return (
             <div>
                 <div className="text-center pb-5">
@@ -56,9 +90,9 @@ export default function Dashboard() {
                         return (<div className="card col-lg-4 mx-auto p-3 m-3" style={{ width: "18rem" }}>
                             <img src={`data:image/png;base64,${base64String}`} className="card-img-top mx-auto" alt="https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg" />
                             <div className="card-body text-center">
-                                <h5 className="card-title">Card title</h5>
-                                <p className="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                <button value={item.dr_email} onClick={(e) => CloseQuery(e.target.value)} className="btn btn-info" disabled={!item.is_open}>{item.is_open ? "Active" : "Resolved"}</button>
+                                {user.role === "Ambulance" ? <ShowAmbulance user_address={item.user_address} user_email={item.user_email} user_mobile={item.user_mobile} user_name={item.user_name} />
+                                    : <><ShowPublic dr_email={item.dr_email} dr_mobile={item.dr_mobile} hospital={item.hospital} />
+                                        <button value={item.dr_email} onClick={(e) => CloseQuery(e.target.value)} className="btn btn-info" disabled={!item.is_open}>{item.is_open ? "Active" : "Resolved"}</button></>}
                             </div>
                         </div>);
                     })
@@ -88,11 +122,11 @@ export default function Dashboard() {
 
     return (<>
         <Header />
-        <div className="container-fluid">
+        <>{isLoading ? <LoadingSpinner /> : <div className="container-fluid">
             <div className="items">
                 {query.length > 0 ? <ShowQuery data={query} /> : <EmptyDashboard />}
             </div>
-        </div>
+        </div>}</>
         <Footer />
     </>);
 }

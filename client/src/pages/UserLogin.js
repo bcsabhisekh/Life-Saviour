@@ -15,7 +15,7 @@ export default function UserLogin() {
     const [data, setData] = useState({
         email: "",
         password: "",
-        role: "",
+        role: ""
     });
 
     const handleChange = (e) => {
@@ -45,7 +45,7 @@ export default function UserLogin() {
                         name: response.data.name,
                         mobile: response.data.mobile,
                         role: "Ambulance",
-                        email: response.email
+                        email: response.data.email
                     });
                     setUser(obj);
                     alert("Valid authentication");
@@ -73,7 +73,7 @@ export default function UserLogin() {
                         name: response.data.name,
                         mobile: response.data.mobile,
                         role: "Public",
-                        email: response.email
+                        email: response.data.email
                     });
                     setUser(obj);
                     alert("Valid authentication");

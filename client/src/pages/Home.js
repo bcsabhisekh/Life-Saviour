@@ -46,7 +46,7 @@ export default function Home() {
                     <div class="col-md-6 d-flex justify-content-center align-middle">
                         <div>
                             <div className="p-5 text-center">
-                                <h3>Lorem ipsum dolor sit amet, consectetur.</h3>
+                                <h3>Having any emergency, just use my services we are working for you</h3>
                             </div>
                             <div className="text-center">
                                 <button type="button" onClick={() => navigate("/usersignup")} class="btn btn-success m-2">Sign Up</button>

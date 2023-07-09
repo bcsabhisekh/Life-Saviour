@@ -7,6 +7,7 @@ import multer from "multer";
 import fs from "fs"
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
+import promisify from "util";
 dotenv.config();
 
 const app = express();
@@ -110,86 +111,97 @@ const GetDistance = async function (origin, destination) {
         return data.data.resourceSets[0].resources[0].results[0].travelDistance;
     }
     catch {
-        return 100000;
+        return 1e9;
     }
-    // data.data.resourceSets[0].resources[0].results[0].travelDistance;
 }
+
 
 export const SaveQuery = async function (req, res) {
-    // console.log(req.body);
+
     const accident = req.body.description;
+
     const userDetail = {
-        user_name: req.body.user_name, user_email: req.body.email, user_mobile: req.body.mobile,
-        lat: req.body.lat, log: req.body.log
+        user_name: req.body.user_name,
+        user_email: req.body.email,
+        user_mobile: req.body.mobile,
+        lat: req.body.lat,
+        log: req.body.log
     };
 
-    let newresponse = [];
     const response = await hospitalModel.find();
 
-    // Greedy Algorithm
-    response && response.map(async (item) => {
-        const origin = (userDetail.lat + "," + userDetail.log).toString();
-        const destination = (item.lat + "," + item.log).toString();
-        const obj = new Object();
-        obj.id = item.id;
-        obj['name'] = item.name;
-        obj['accident'] = item.accident;
-        obj['distance'] = await GetDistance(origin, destination);
-        obj['driver'] = await driverModel.findOne({ hospital: item.name, free: true });
-        if (obj['driver'] && Object.keys(obj['driver']).length > 0)
-            newresponse.push(obj);
+    async function fillOptions() {
+        const newresponse = [];
+        await Promise.all(response.map(async (item) => {
+            const origin = (userDetail.lat + "," + userDetail.log).toString();
+            const destination = (item.lat + "," + item.log).toString();
+            const obj = {};
+            obj.id = item.id;
+            obj.name = item.name;
+            obj.accident = item.accident;
+            obj.distance = await GetDistance(origin, destination);
+            obj.driver = await driverModel.findOne({ hospital: item.name, free: true });
+            if (obj.driver !== null)
+                newresponse.push(obj);
+        }));
+        return newresponse;
+    }
+
+    const newresponse = await fillOptions();
+
+    function compare(a, b) {
+        return a.distance - b.distance;
+    }
+
+    newresponse.sort(compare);
+
+    let data = { id: uuid(), accident: true, distance: 1e9, driver: { name: "Govt. Employee", email: "csgwalior1@gmail.com", mobile: +91108 }, name: "District Hospital Murar Gwalior" };
+
+    // console.log(newresponse.length);
+
+    for (let i = 0; i < newresponse.length; i++) {
+        const obj = newresponse[i];
+        if (obj[accident] === true && obj.driver.free === true) {
+            // console.log(obj);
+            data = obj;
+            break;
+        }
+    }
+
+    const saveQuery = new queryModel({
+        id: uuid(),
+        user_name: userDetail.user_name,
+        user_email: userDetail.user_email,
+        user_mobile: userDetail.user_mobile,
+        user_address: userDetail.lat + ',' + userDetail.log,
+        dr_name: data.driver.name,
+        dr_email: data.driver.email,
+        dr_mobile: data.driver.mobile,
+        is_open: true,
+        hospital: data.name,
+        img_name: req.body.name,
+        img: {
+            data: fs.readFileSync("./images/" + req.file.filename),
+            contentType: "image/png"
+        }
     });
 
-    let data = new Object();
+    await saveQuery.save()
+        .then(() => console.log('Data is saved'))
+        .catch((err) => console.log(err));
 
-    setTimeout(async function () {
-        function compare(a, b) {
-            if (a.distance < b.distance)
-                return -1;
-            else if (a.distance > b.distance)
-                return 1;
-            else
-                return 0;
-        }
-        newresponse.sort(compare);
-        for (let i = 0; i < newresponse.length; i++) {
-            const obj = newresponse[i];
-            if (obj[`${accident}`] == true) {
-                data = obj;
-                break;
-            }
-        }
-
-        console.log(data);
-
-        const saveQuery = new queryModel({
-            id: uuid(),
-            user_name: userDetail.user_name,
-            user_email: userDetail.user_email,
-            user_mobile: userDetail.mobile,
-            user_address: userDetail.lat + ',' + userDetail.log,
-            dr_name: data.driver.name,
-            dr_email: data.driver.email,
-            dr_mobile: data.driver.mobile,
-            is_open: true,
-            hospital: data.hospital,
-            img_name: req.body.name,
-            img: {
-                data: fs.readFileSync("./images/" + req.file.filename),
-                contentType: "image/png"
-            }
-        });
-        await driverModel.updateOne({ email: data.driver.email }, { $set: { free: false } });
-        await saveQuery.save().then(() => console.log('data is saved')).catch((err) => console.log(err));
-    }, 3000);
-    setTimeout(() => (res.send({ message: "ok" })), 3000);
+    await driverModel.updateOne({ email: data.driver.email }, { $set: { free: false } }).then(() => console.log("Data Updated")).catch((err) => console.log(err));
+    
+    res.send(data);
 }
+
 
 
 export const CloseQuery = async function (req, res) {
     const { dr_email } = req.body;
-    await driverModel.updateOne({ email: dr_email }, { $set: { free: true } });
-    await queryModel.updateOne({ dr_email: dr_email }, { $set: { is_open: false } });
+    if (dr_email !== "csgwalior1@gmail.com")
+        await driverModel.updateOne({ email: dr_email }, { $set: { free: true } });
+    await queryModel.updateMany({ dr_email: dr_email }, { $set: { is_open: false } });
     res.send({ message: "ok" });
 }
 

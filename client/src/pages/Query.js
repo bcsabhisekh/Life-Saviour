@@ -5,6 +5,7 @@ import Footer from "../components/Footer";
 import "./Query.css";
 import axios from "axios";
 import { UserContext } from "../App";
+import LoadingSpinner from "./LoadingSpinner";
 
 
 export default function Query() {
@@ -13,13 +14,12 @@ export default function Query() {
 
     const navigate = useNavigate();
 
+    const [isLoading, setIsLoading] = useState(false);
+
     const [user, setUser] = useContext(UserContext);
 
     const [detail, setDetail] = useState({
-        description: "",
-        mobile: "",
-        email: "",
-        name: "",
+        description: ""
     });
 
     const [location, setLocation] = useState({ lat: "", log: "" });
@@ -58,14 +58,15 @@ export default function Query() {
 
     const onFormSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
         const formData = new FormData();
         formData.append("testImage", file);
         formData.append("description", detail.description);
-        formData.append("email", detail.email);
-        formData.append("mobile", detail.mobile);
+        formData.append("email", user.email);
+        formData.append("mobile", user.mobile);
         formData.append("lat", location.lat);
         formData.append("log", location.log);
-        formData.append("user_name", detail.name);
+        formData.append("user_name", user.name);
         formData.append("name", date.toISOString());
         const config = {
             headers: {
@@ -75,10 +76,13 @@ export default function Query() {
         const url = "http://localhost:5000/query";
         try {
             const response = await axios.post(url, formData, config);
-            console.log(response.data);
+            // console.log(response.data);
+            console.log(response);
             navigate("/dashboard");
+            setIsLoading(false);
         }
         catch (err) {
+            setIsLoading(false);
             throw new Error('Unable to get a token.')
         }
     }
@@ -86,38 +90,39 @@ export default function Query() {
     return (
         <>
             <Header />
-            <div className="container-fluid">
-                <div className="items">
-                    <form onSubmit={onFormSubmit}>
-                        <div className="inneritem shadow pb-5">
-                            <div className="text-center pb-5 pt-5">
-                                <h2>Book Emergency</h2>
-                            </div>
-                            <div className="row ">
-                                <div className="mb-3 col-md-6 mx-auto">
-                                    <label for="exampleInputDescription" className="form-label">Description</label>
-                                    <input autocomplete="off" name="description" type="text" value={detail.description} onChange={handleChange} className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" />
+            <>{isLoading ? <LoadingSpinner /> :
+                <div className="container-fluid">
+                    <div className="items">
+                        <form onSubmit={onFormSubmit}>
+                            <div className="inneritem shadow pb-5">
+                                <div className="text-center pb-5 pt-5">
+                                    <h2>Book Emergency</h2>
+                                </div>
+                                <div className="row ">
+                                    <div className="mb-3 col-md-6 mx-auto">
+                                        <label for="exampleInputDescription" className="form-label">Description</label>
+                                        <input autocomplete="off" name="description" type="text" value={detail.description} onChange={handleChange} className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" />
+                                    </div>
+                                </div>
+                                <div className="row ">
+                                    <div className="mb-3 col-md-6 mx-auto">
+                                        <label for="exampleInputAddress" className="form-label">Current Location</label>
+                                        <input autocomplete="off" name="location" type="text" value={location.lat && location.lat + ',' + location.log} className="form-control" id="exampleInputLocation" aria-describedby="locationHelp" />
+                                    </div>
+                                </div>
+                                <div className="row ">
+                                    <div className="mb-3 col-md-6 mx-auto">
+                                        <label for="exampleInputImage" className="form-label">Image Upload</label>
+                                        <input type={'file'} name="testImage" onChange={onInputChange} />
+                                    </div>
+                                </div>
+                                <div className="text-center p-3">
+                                    <button type="submit" className="btn btn-info">Submit</button>
                                 </div>
                             </div>
-                            <div className="row ">
-                                <div className="mb-3 col-md-6 mx-auto">
-                                    <label for="exampleInputAddress" className="form-label">Current Location</label>
-                                    <input autocomplete="off" name="location" type="text" value={location.lat && location.lat + ',' + location.log} className="form-control" id="exampleInputLocation" aria-describedby="locationHelp" />
-                                </div>
-                            </div>
-                            <div className="row ">
-                                <div className="mb-3 col-md-6 mx-auto">
-                                    <label for="exampleInputImage" className="form-label">Image Upload</label>
-                                    <input type={'file'} name="testImage" onChange={onInputChange} />
-                                </div>
-                            </div>
-                            <div className="text-center p-3">
-                                <button type="submit" className="btn btn-info">Submit</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div >
+                        </form>
+                    </div>
+                </div >}</>
             <Footer />
         </>
     );
