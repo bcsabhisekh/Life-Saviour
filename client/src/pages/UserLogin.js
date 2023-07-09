@@ -8,6 +8,8 @@ import { UserContext } from "../App";
 
 export default function UserLogin() {
 
+    axios.defaults.withCredentials = true;
+
     const navigate = useNavigate();
 
     const [user, setUser] = useContext(UserContext);

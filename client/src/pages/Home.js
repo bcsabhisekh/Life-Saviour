@@ -4,7 +4,7 @@ import Header from "../components/Header.js";
 import Footer from "../components/Footer.js";
 import Body from "../components/Body.js";
 import axios from "axios";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import UserLogin from "./UserLogin.js";
 import Hero from "../components/images/hero.jpg";
 import Hospital from "../components/images/hospital.jpg";
@@ -13,27 +13,21 @@ import Notification from "../components/images/notification.jpg";
 import Oauth from "../components/images/oauth.jpg";
 import Driver from "../components/images/driver.png"
 import Victim from "../components/images/victim.png"
-import { useNavigate } from "react-router-dom";
-
+import { useNavigate, Link } from "react-router-dom";
+import { UserContext } from "../App";
 
 export default function Home() {
 
+    axios.defaults.withCredentials = true;
+
+    const [user, setUser] = useContext(UserContext);
+
+    const logOut = async function (event) {
+        await axios.get('http://localhost:5000/logout').then((res) => { alert(res.data.message); window.location.reload(); }).catch((err) => console.log(err))
+    }
+
+
     const navigate = useNavigate();
-
-    // const [data, setData] = useState([]);
-
-    // const fetchImage = async function () {
-    //     try {
-    //         const response = await axios.get("http://localhost:5000/");
-    //         setData(response.data);
-    //     } catch (err) {
-    //         console.log(err);
-    //     }
-    // }
-
-    // useEffect(() => {
-    //     fetchImage();
-    // }, []);
 
     return (
         <>
@@ -49,8 +43,8 @@ export default function Home() {
                                 <h3>Having any emergency, just use my services we are working for you</h3>
                             </div>
                             <div className="text-center">
-                                <button type="button" onClick={() => navigate("/usersignup")} class="btn btn-success m-2">Sign Up</button>
-                                <button type="button" onClick={() => navigate("/userlogin")} class="btn btn-dark m-2">Sign In</button>
+                                {Object.keys(user).length > 0 ? <><button type="button" onClick={logOut} class="btn btn-dark m-2">Log Out</button></> : <><button type="button" onClick={() => navigate("/usersignup")} class="btn btn-success m-2">Sign Up</button>
+                                    <button type="button" onClick={() => navigate("/userlogin")} class="btn btn-dark m-2">Sign In</button></>}
                             </div>
                         </div>
                     </div>

@@ -15,15 +15,6 @@ const MONGO_KEY = process.env.MONGO_KEY;
 
 mongoose.connect("mongodb+srv://" + MONGO_KEY + "@cluster0.mrg3ztd.mongodb.net/imageDB", { useNewUrlParser: true }).then(() => console.log("connected successfully")).catch((err) => console.log(err));
 
-// const imageSchema = new mongoose.Schema({
-//     id: String,
-//     name: String,
-//     img: {
-//         data: Buffer,
-//         contentType: String
-//     }
-// });
-
 const userSchema = new mongoose.Schema({
     id: String,
     name: String,
@@ -104,6 +95,23 @@ const multerFilter = (req, file, cb) => {
 const upload = multer({ storage: storage, fileFilter: multerFilter });     // to use this storage engine.the define engine is "storage"
 
 export const middleWare = upload.single('testImage');
+
+export const logOut = async function (req, res) {
+    // res.clearCookie('connect.sid');
+    res.clearCookie(process.env.COOKIE_NAME);
+    req.session.destroy();
+    // console.log(req.session);
+    res.status(200).send({ message: "Log Out Successfully." });
+}
+
+
+export const checkAuth = async function (req, res) {
+    if (req.session.user) {
+        res.send({ valid: true, data: req.session.user });
+    }
+    else
+        res.send({ valid: false });
+}
 
 const GetDistance = async function (origin, destination) {
     try {
@@ -191,7 +199,7 @@ export const SaveQuery = async function (req, res) {
         .catch((err) => console.log(err));
 
     await driverModel.updateOne({ email: data.driver.email }, { $set: { free: false } }).then(() => console.log("Data Updated")).catch((err) => console.log(err));
-    
+
     res.send(data);
 }
 
@@ -235,6 +243,7 @@ export const DriverLogIn = async function (req, res) {
     if (response) {
         bcrypt.compare(password, response.password).then(function (result) {
             if (result) {
+                req.session.user = { name: response.name, email: response.email, mobile: response.mobile, role: "Ambulance" };
                 res.status(200).send(response);
             }
             else {
@@ -295,6 +304,7 @@ export const UserLogIn = async function (req, res) {
     if (response) {
         bcrypt.compare(password, response.password).then(function (result) {
             if (result) {
+                req.session.user = { name: response.name, email: response.email, mobile: response.mobile, role: "Public" };
                 res.status(200).send(response);
             }
             else {
@@ -316,19 +326,6 @@ export const UserSignUp = async function (req, res) {
         res.send({ message: "User already exist with this email" });
     }
     else {
-        // bcrypt.genSalt(12, function (err, salt) {
-        //     bcrypt.hash(password, salt, function (err, hash) {
-        //         const user = new userModel({
-        //             id: uuid(),
-        //             name: name,
-        //             email: email,
-        //             mobile: mobile,
-        //             role: role,
-        //             password: hash
-        //         });
-        //         user.save();
-        //     });
-        // });
         bcrypt.hash(password, 12).then(function (hash) {
             const user = new userModel({
                 id: uuid(),

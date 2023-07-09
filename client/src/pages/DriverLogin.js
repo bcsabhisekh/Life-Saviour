@@ -4,6 +4,8 @@ import axios from "axios";
 
 export default function DriverLogin() {
 
+    axios.defaults.withCredentials = true;
+
     const navigate = useNavigate();
 
     const [user, setUser] = useState({

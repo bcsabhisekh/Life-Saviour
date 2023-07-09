@@ -1,5 +1,5 @@
 import express from "express"
-import { MyFunction, middleWare, SaveQuery, UserLogIn, UserSignUp, DriverLogIn, DriverSignUp, AdminLogIn, AdminSignUp, PostHospitalDetails, GetQuery, CloseQuery } from "../controllers/functions.js";
+import { MyFunction, middleWare, SaveQuery, UserLogIn, UserSignUp, DriverLogIn, DriverSignUp, AdminLogIn, AdminSignUp, PostHospitalDetails, GetQuery, CloseQuery, checkAuth, logOut } from "../controllers/functions.js";
 
 const router = express.Router();
 
@@ -14,6 +14,7 @@ router.post("/hospitaldetails", PostHospitalDetails);
 router.get("/", MyFunction);
 router.get("/getquery", GetQuery);
 router.post("/closequery", CloseQuery);
-
+router.get("/checkauth", checkAuth);
+router.get("/logout", logOut);
 
 export default router;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Query from "./pages/Query.js";
 import Home from "./pages/Home.js";
@@ -9,11 +9,18 @@ import AdminSignUp from "./pages/AdminSignUp.js";
 import DriverLogin from "./pages/DriverLogin.js";
 import DriverSignUp from "./pages/DriverSignUp.js";
 import Dashboard from "./pages/Dashboard.js";
+import axios from "axios";
 export const UserContext = React.createContext();
 
 export default function App() {
 
   const [user, setUser] = useState({});
+
+  useEffect(() => {
+    axios.get('http://localhost:5000/checkauth').then((res) => { if (res.data.valid) { setUser(res.data.data); } }).catch((err) => {
+      console.log(err);
+    });
+  }, []);
 
   return (
     <div>

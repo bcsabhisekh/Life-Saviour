@@ -11,6 +11,8 @@ import LoadingSpinner from "./LoadingSpinner";
 
 export default function Dashboard() {
 
+    axios.defaults.withCredentials = true;
+
     const [query, setQuery] = useState([]);
 
     const [isLoading, setIsLoading] = useState(false);

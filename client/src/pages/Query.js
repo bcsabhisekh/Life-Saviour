@@ -10,6 +10,8 @@ import LoadingSpinner from "./LoadingSpinner";
 
 export default function Query() {
 
+    axios.defaults.withCredentials = true;
+
     const date = new Date();
 
     const navigate = useNavigate();

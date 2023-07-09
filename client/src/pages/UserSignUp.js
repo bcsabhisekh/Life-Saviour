@@ -7,6 +7,8 @@ import "./UserSignUp.css";
 
 export default function UserSignUp() {
 
+    axios.defaults.withCredentials = true;
+
     const navigate = useNavigate();
 
     const [user, setUser] = useState({
