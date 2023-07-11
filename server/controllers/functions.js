@@ -354,6 +354,10 @@ export const PostHospitalDetails = async function (req, res) {
 }
 
 export const GetQuery = async function (req, res) {
-    const data = await queryModel.find();
+    let data;
+    if (req.params.role == "Ambulance")
+        data = await queryModel.find({ dr_email: req.params.id });
+    else
+        data = await queryModel.find({ user_email: req.params.id });
     res.json(data);
 }

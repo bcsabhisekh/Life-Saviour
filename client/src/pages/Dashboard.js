@@ -7,6 +7,10 @@ import "./Dashboard.css";
 import DashboardImage from "../components/images/dashboard.png";
 import { UserContext } from "../App.js";
 import LoadingSpinner from "./LoadingSpinner";
+import { io } from 'socket.io-client';
+import Chat from './Chat';
+
+const socket = io.connect("http://localhost:5000");
 
 
 export default function Dashboard() {
@@ -19,12 +23,25 @@ export default function Dashboard() {
 
     const [user, setUser] = useContext(UserContext);
 
+    const [meet, setMeet] = useState({});
+
     const navigate = useNavigate();
+
+    const [showChat, setShowChat] = useState(false);
+
+    const joinRoom = (event) => {
+        if (event.target.name !== "" && event.target.value !== "") {
+            socket.emit("join_room", event.target.value);
+            setShowChat(true);
+            const obj = new Object({ username: event.target.name, room: event.target.value });
+            setMeet(obj);
+        }
+    }
 
     const GetQuery = async function () {
         setIsLoading(true);
         try {
-            const response = await axios.get("http://localhost:5000/getquery");
+            const response = await axios.get(`http://localhost:5000/getquery/${user.email}/${user.role}`);
             // console.log(response.data);
             setQuery(response.data);
             setIsLoading(false);
@@ -45,9 +62,9 @@ export default function Dashboard() {
                 },
                 data: { dr_email: dr_email }
             });
-            console.log(response.data.message);
+            // console.log(response.data.message);
             setIsLoading(false);
-            navigate("/dashboard");
+            window.location.reload();
         }
         catch (err) {
             setIsLoading(false);
@@ -92,9 +109,11 @@ export default function Dashboard() {
                         return (<div className="card col-lg-4 mx-auto p-3 m-3" style={{ width: "18rem" }}>
                             <img src={`data:image/png;base64,${base64String}`} className="card-img-top mx-auto" alt="https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg" />
                             <div className="card-body text-center">
-                                {user.role === "Ambulance" ? <ShowAmbulance user_address={item.user_address} user_email={item.user_email} user_mobile={item.user_mobile} user_name={item.user_name} />
-                                    : <><ShowPublic dr_email={item.dr_email} dr_mobile={item.dr_mobile} hospital={item.hospital} />
-                                        <button value={item.dr_email} onClick={(e) => CloseQuery(e.target.value)} className="btn btn-info" disabled={!item.is_open}>{item.is_open ? "Active" : "Resolved"}</button></>}
+                                {user.role === "Ambulance" ? <><ShowAmbulance user_address={item.user_address} user_email={item.user_email} user_mobile={item.user_mobile} user_name={item.user_name} />
+                                    <button name={item.dr_name} value={item.id} onClick={joinRoom} className="btn btn-info" disabled={!item.is_open}>Chat with Patient</button>
+                                </> : <><ShowPublic dr_email={item.dr_email} dr_mobile={item.dr_mobile} hospital={item.hospital} />
+                                    <button value={item.dr_email} onClick={(e) => CloseQuery(e.target.value)} className="btn btn-info m-2" disabled={!item.is_open}>{item.is_open ? "Active" : "Resolved"}</button>
+                                    <button name={item.user_name} value={item.id} onClick={joinRoom} className="btn btn-info" disabled={!item.is_open}>Chat with Doctor</button></>}
                             </div>
                         </div>);
                     })
@@ -124,11 +143,11 @@ export default function Dashboard() {
 
     return (<>
         <Header />
-        <>{isLoading ? <LoadingSpinner /> : <div className="container-fluid">
+        <>{isLoading ? < LoadingSpinner /> : <>{showChat ? <Chat socket={socket} username={meet.username} room={meet.room} /> : <div className="container-fluid">
             <div className="items">
                 {query.length > 0 ? <ShowQuery data={query} /> : <EmptyDashboard />}
             </div>
-        </div>}</>
+        </div>}</>}</>
         <Footer />
     </>);
 }

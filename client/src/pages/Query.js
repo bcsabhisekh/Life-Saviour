@@ -77,9 +77,14 @@ export default function Query() {
         };
         const url = "http://localhost:5000/query";
         try {
-            const response = await axios.post(url, formData, config);
-            // console.log(response.data);
-            console.log(response);
+            if (detail.description !== "Select") {
+                const response = await axios.post(url, formData, config);
+                // console.log(response.data);
+                // console.log(response);
+            }
+            else {
+                alert("Please Select a Valid Option");
+            }
             navigate("/dashboard");
             setIsLoading(false);
         }
@@ -103,7 +108,15 @@ export default function Query() {
                                 <div className="row ">
                                     <div className="mb-3 col-md-6 mx-auto">
                                         <label for="exampleInputDescription" className="form-label">Description</label>
-                                        <input autocomplete="off" name="description" type="text" value={detail.description} onChange={handleChange} className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" />
+                                        {/* <input autocomplete="off" name="description" type="text" value={detail.description} onChange={handleChange} className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" /> */}
+                                        <label className="ms-3 label-sm">
+                                            <select name="description" className="form-select mt-2" value={detail.description} onChange={handleChange}>
+                                                <option value="Select">Select</option>
+                                                <option value="accident">Accident</option>
+                                                <option value="accident">Dengue Fever</option>
+                                                <option value="accident">Corona Fever</option>
+                                            </select>
+                                        </label>
                                     </div>
                                 </div>
                                 <div className="row ">

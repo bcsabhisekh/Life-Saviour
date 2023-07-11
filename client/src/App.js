@@ -28,8 +28,8 @@ export default function App() {
         <Router>
           <Routes>
             <Route exact path="/" element={<Home />} />
-            <Route path="/userlogin" element={<UserLogin />} />
-            <Route path="/usersignup" element={<UserSignUp />} />
+            <Route path="/userlogin" element={Object.keys(user).length > 0 ? <Home /> : <UserLogin />} />
+            <Route path="/usersignup" element={Object.keys(user).length > 0 ? <Home /> : <UserSignUp />} />
             <Route path="/query" element={Object.keys(user).length > 0 ? <Query /> : <UserLogin />} />
             <Route path="/dashboard" element={Object.keys(user).length > 0 ? <Dashboard /> : <UserLogin />} />
           </Routes>

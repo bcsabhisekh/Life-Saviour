@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "./UserLogin.css";
 import { UserContext } from "../App";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function UserLogin() {
 
@@ -13,6 +14,8 @@ export default function UserLogin() {
     const navigate = useNavigate();
 
     const [user, setUser] = useContext(UserContext);
+
+    const [isLoading, setIsLoading] = useState(false);
 
     const [data, setData] = useState({
         email: "",
@@ -30,6 +33,7 @@ export default function UserLogin() {
 
     const onFormSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
         const { email, password, role } = data;
         if (email && password && role == "Ambulance") {
             try {
@@ -86,9 +90,11 @@ export default function UserLogin() {
                 alert(response.data.message);
                 navigate("/dashboard");
             }
+            setIsLoading(false);
         }
         else {
             alert("Please complete all the fields...");
+            setIsLoading(false);
         }
     }
 
@@ -98,7 +104,7 @@ export default function UserLogin() {
         <>
             <Header />
             <div className="container-fluid">
-                <div className="items">
+                <>{isLoading ? <LoadingSpinner /> : <div className="items">
                     <form onSubmit={onFormSubmit} >
                         <div className="inneritem shadow pb-5">
                             <div className="text-center pb-4 pt-5">
@@ -138,7 +144,7 @@ export default function UserLogin() {
                             </div>
                         </div>
                     </form>
-                </div>
+                </div>}</>
             </div >
             <Footer />
         </>

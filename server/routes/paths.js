@@ -12,7 +12,7 @@ router.post("/adminlogin", AdminLogIn);
 router.post("/adminsignup", AdminSignUp);
 router.post("/hospitaldetails", PostHospitalDetails);
 router.get("/", MyFunction);
-router.get("/getquery", GetQuery);
+router.get("/getquery/:id/:role", GetQuery);
 router.post("/closequery", CloseQuery);
 router.get("/checkauth", checkAuth);
 router.get("/logout", logOut);
