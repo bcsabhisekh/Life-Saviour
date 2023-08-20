@@ -82,11 +82,11 @@ Start the backend server
 
 **Response at Patient End**
 
-![Screenshot from 2023-08-21 02-47-37](https://github.com/bcsabhisekh/Life-Saviour/assets/87228664/c1e4219a-17aa-4b3d-98ee-cd412ce99d90)
+![Screenshot from 2023-08-21 03-30-45](https://github.com/bcsabhisekh/Life-Saviour/assets/87228664/cdfac712-0964-44b2-97d9-97f5ae143814)
 
 **Response at Ambulance Driver End**
 
-![Screenshot from 2023-08-21 02-49-19](https://github.com/bcsabhisekh/Life-Saviour/assets/87228664/c274c23c-ee90-4264-9fe8-c4f07769a20f)
+![Screenshot from 2023-08-21 03-31-07](https://github.com/bcsabhisekh/Life-Saviour/assets/87228664/df20e56d-1084-4edf-9338-13581a77d24b)
 
 **Chat between Patient and Medical Assistant**
 
